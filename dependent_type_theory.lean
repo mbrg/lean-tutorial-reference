@@ -1,15 +1,6 @@
 universe u
 
 namespace one
-
-  def double : ℕ → ℕ := λ x, x + x
-  def square : ℕ → ℕ := λ x, x * x
-  def do_twice : (ℕ → ℕ) → ℕ → ℕ := λ f x, f (f x)
-
-  def compose (α β γ : Type) (g : β → γ) (f : α → β) (x : α) :
-    γ :=
-  g (f x)
-
   /-
   As an exercise, we encourage you to use do_twice and double to 
   define functions that quadruple their input, 
@@ -21,11 +12,15 @@ namespace one
   Then evaluate Do_Twice do_twice double 2.
   -/
 
+  -- reference code from section 2.4
+  def double : ℕ → ℕ := λ x, x + x
+  def square : ℕ → ℕ := λ x, x * x
+  def do_twice : (ℕ → ℕ) → ℕ → ℕ := λ f x, f (f x)
+  def compose (α β γ : Type) (g : β → γ) (f : α → β) (x : α) : γ := g (f x)
+
+  -- solution
   def Do_Twice {α :Type} (f: (α → α) → (α → α)) (g: α → α) (x: α) := f g x
-
-  constant Do_Twice_spec : ((ℕ → ℕ) → (ℕ → ℕ)) → (ℕ → ℕ) → (ℕ → ℕ)
-  #check Do_Twice_spec
-
+  
   #reduce @Do_Twice ℕ do_twice double 2
   #reduce Do_Twice do_twice double 2
 
