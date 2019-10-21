@@ -70,8 +70,27 @@ iff.intro
             (λ hr: r, or.intro_right p (and.intro hq hr))))
 
 -- other properties
-example : (p → (q → r)) ↔ (p ∧ q → r) := sorry
-example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) := sorry
+example : (p → (q → r)) ↔ (p ∧ q → r) :=
+iff.intro
+    (assume h: p → (q → r),
+    assume hpq: p ∧ q,
+    have hqr: q → r, from h hpq.left,
+    show r, from hqr hpq.right)
+    (assume h: p ∧ q → r,
+    assume hp: p,
+    assume hq: q,
+    show r, from h (and.intro hp hq))
+
+example : ((p ∨ q) → r) ↔ (p → r) ∧ (q → r) := 
+iff.intro
+    (assume h : (p ∨ q) → r, and.intro
+        (assume hp: p, show r, from h (or.intro_left q hp))
+        (assume hq: q, show r, from h (or.intro_right p hq)))
+    (assume h : (p → r) ∧ (q → r),
+    assume hpq: p ∨ q, or.elim hpq
+        (assume hp: p, show r, from h.left hp)
+        (assume hq: q, show r, from h.right hq))
+
 example : ¬(p ∨ q) ↔ ¬p ∧ ¬q := sorry
 example : ¬p ∨ ¬q → ¬(p ∧ q) := sorry
 example : ¬(p ∧ ¬p) := sorry
