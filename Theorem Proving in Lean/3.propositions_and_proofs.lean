@@ -46,11 +46,28 @@ iff.intro
         (λ hp : p, or.intro_left r (or.intro_left q hp))
         (λ hqr : q ∨ r, or.elim hqr
             (λ hq : q, or.intro_left r (or.intro_right p hq))
-            (λ hr : r, or.intro_right (p ∨ q) hr))
+            (λ hr : r, or.intro_right (p ∨ q) hr)))
 
 -- distributivity
-example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) := sorry
-example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) := sorry
+example : p ∧ (q ∨ r) ↔ (p ∧ q) ∨ (p ∧ r) :=
+iff.intro 
+    (λ h : p ∧ (q ∨ r), or.elim h.right
+        (λ hq: q, or.intro_left (p ∧ r) (and.intro h.left hq))
+        (λ hr: r, or.intro_right (p ∧ q) (and.intro h.left hr)))
+    (λ h : (p ∧ q) ∨ (p ∧ r), or.elim h
+        (λ hpq: p ∧ q, and.intro hpq.left (or.intro_left r hpq.right))
+        (λ hpr: p ∧ r, and.intro hpr.left (or.intro_right q hpr.right)))
+
+example : p ∨ (q ∧ r) ↔ (p ∨ q) ∧ (p ∨ r) :=
+iff.intro 
+    (λ h : p ∨ (q ∧ r), or.elim h
+        (λ hp: p, and.intro (or.intro_left q hp) (or.intro_left r hp))
+        (λ hqr: q ∧ r, and.intro (or.intro_right p hqr.left) (or.intro_right p hqr.right)))
+    (λ h : (p ∨ q) ∧ (p ∨ r), or.elim h.left
+        (λ hp: p, or.intro_left (q ∧ r) hp)
+        (λ hq: q, or.elim h.right
+            (λ hp: p, or.intro_left (q ∧ r) hp)
+            (λ hr: r, or.intro_right p (and.intro hq hr))))
 
 -- other properties
 example : (p → (q → r)) ↔ (p ∧ q → r) := sorry
