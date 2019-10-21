@@ -1,0 +1,2 @@
+In this repo you can find solutions to exercises provided at [Theorem Proving in Lean](https://leanprover.github.io/theorem_proving_in_lean/) for reference.
+These are not official or officially tested solutions, they are simply a newbie's best effort.
