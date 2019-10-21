@@ -20,10 +20,8 @@ namespace one
 
   -- solution
   def Do_Twice {α :Type} (f: (α → α) → (α → α)) (g: α → α) (x: α) := f g x
-  
   #reduce @Do_Twice ℕ do_twice double 2
   #reduce Do_Twice do_twice double 2
-
 end one
 
 namespace two
@@ -39,7 +37,6 @@ namespace two
   := λ (a: α), (λ (b: β), f (a, b) )
   def uncurry (α β γ : Type) (f : α → β → γ) : α × β → γ 
   := λ (x : α × β), f x.1 x.2
-
 end two
 
 namespace three
@@ -55,6 +52,8 @@ namespace three
   involving the constants that you have declared.
   -/
 
+  -- dependant types reference code from section 2.9
+
   constant cons   : Π {α : Type u}, α → list α → list α
   constant nil    : Π {α : Type u}, list α
   constant append : Π {α : Type u}, list α → list α → list α
@@ -67,6 +66,8 @@ namespace three
   #check append (cons a nil) l1
   #check append (append (cons a nil) l1) l2
 
+  -- vector reference code from section 2.8
+
   constant vec : Type u → ℕ → Type u
 
   constant vec_empty : Π α : Type u, vec α 0
@@ -77,6 +78,8 @@ namespace three
   #check (vec_cons ℕ 0) 9 (vec_empty ℕ) -- vec of len 1
   #check (vec_cons ℕ 1) 9 ((vec_cons ℕ 0) 9 (vec_empty ℕ)) -- vec of len 2
   #check vec_append ℕ 2 2 ((vec_cons ℕ 1) 9 ((vec_cons ℕ 0) 9 (vec_empty ℕ))) ((vec_cons ℕ 1) 9 ((vec_cons ℕ 0) 9 (vec_empty ℕ))) -- vec of len 4
+
+  -- solution
 
   constant Vec_empty : Π {α : Type u}, vec α 0
   constant Vec_cons : Π {α : Type u} {n: ℕ}, α → vec α n → vec α (n + 1)
@@ -92,7 +95,6 @@ namespace three
 
   #check Vec_add (Vec_append (Vec_cons 9 (Vec_cons 9 Vec_empty)) (Vec_cons 9 (Vec_cons 9 Vec_empty))) (Vec_cons 9 (Vec_cons 9 Vec_empty))  -- vec of len 6
   #check Vec_reverses (Vec_cons 9 (Vec_cons 9 Vec_empty))
-
 end three
 
 namespace four
@@ -105,4 +107,20 @@ namespace four
   Once again, declare some variables and check some expressions
   involving the constants that you have declared.
   -/
+
+  -- solution
+  open three
+
+  constant mat : Type u → ℕ → ℕ → Type u
+
+  constant mat_empty : Π {α : Type u}, mat α 0 0
+  constant mat_concat_vecs_as_rows : Π {α : Type u} {n: ℕ}, vec α n → vec α n → mat α 2 n
+  constant mat_concat_vecs_as_cols : Π {α : Type u} {n: ℕ}, vec α n → vec α n → mat α n 2
+
+  #check mat_concat_vecs_as_rows Vec_empty Vec_empty  -- 2x0 matrix
+  #check mat_concat_vecs_as_rows (Vec_cons 9 (Vec_cons 9 Vec_empty)) (Vec_cons 9 (Vec_cons 9 Vec_empty))  -- 2x2 matrix
+
+  constant mat_add : Π {α : Type u} {n m: ℕ},  mat α n m → mat α n m → mat α n m
+  constant mat_mul : Π {α : Type u} {n m t: ℕ},  mat α n m → mat α m t → mat α n t
+  constant mat_mul_by_vec : Π {α : Type u} {n m: ℕ},  mat α n m → vec α m → vec α n
 end four
