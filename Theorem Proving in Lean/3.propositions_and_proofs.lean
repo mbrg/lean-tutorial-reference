@@ -208,8 +208,9 @@ example : ¬(p ↔ ¬p) :=
     -- eliminate negations
     have nnp : ¬¬p, from iff.elim_right h₂ nnnp,
     show false, from absurd nnp nnnp
-    
-example : (p → q) → (¬q → ¬p) :=
+
+-- changed to lemma for later use
+lemma reverse_imp : (p → q) → (¬q → ¬p) :=
     assume hpq: p → q,
     assume nq: ¬q,
     assume hp: p,
@@ -217,10 +218,78 @@ example : (p → q) → (¬q → ¬p) :=
     show false, from absurd hq nq
 
 -- these require classical reasoning
-example : (p → r ∨ s) → ((p → r) ∨ (p → s)) := sorry
-example : ¬(p ∧ q) → ¬p ∨ ¬q := sorry
-example : ¬(p → q) → p ∧ ¬q := sorry
-example : (p → q) → (¬p ∨ q) := sorry
-example : (¬q → ¬p) → (p → q) := sorry
-example : p ∨ ¬p := sorry
+
+lemma notnot : ¬¬p ↔ p :=
+    iff.intro
+        (assume h: ¬¬p,
+        by_contradiction (assume h1 : ¬p, show false, from h h1))
+        (assume h: p,
+        by_cases 
+            (assume h1 : ¬p, absurd h h1)
+            (assume h1 : ¬¬p, h1))
+
+lemma imp_substitue_frst : ((p → q) ∧ (p ↔ r)) → (r → q) :=
+    assume h: (p → q) ∧ (p ↔ r),
+    assume hr: r,
+    have hp: p, from iff.elim_right (and.elim_right h) hr,
+    show q, from and.elim_left h hp
+
+lemma imp_substitue_scnd : ((p → q) ∧ (q ↔ r)) → (p → r) :=
+    assume h: (p → q) ∧ (q ↔ r),
+    assume hp: p,
+    have hq: q, from and.elim_left h hp,
+    show r, from iff.elim_left (and.elim_right h) hq
+
+lemma not_and_to_imp : ¬(p ∧ ¬q) → (p → q) :=
+    assume h : ¬(p ∧ ¬q),
+    assume hp : p,
+    show q, from
+    or.elim (em q)
+        (assume hq : q, hq)
+        (assume hnq : ¬q, absurd (and.intro hp hnq) h)
+
+lemma not_iff : ¬(p → q) → p ∧ ¬q :=
+    assume h : ¬(p → q),
+    by_contradiction
+        (assume n₀ : ¬(p ∧ ¬q),
+        have n₁ : p → q, from not_and_to_imp  p q n₀,
+        show false, from absurd n₁ h)
+
+example : (p → r ∨ s) → ((p → r) ∨ (p → s)) :=
+    assume h : p → r ∨ s,
+    by_contradiction
+        (assume n₀ : ¬((p → r) ∨ (p → s)),
+        have n₁ : ¬(p → r) ∧ ¬(p → s), from iff.elim_left (not_or_and_not (p → r) (p → s)) n₀,
+        have n₂ : p ∧ ¬r, from not_iff p r (and.elim_left n₁),
+        have n₃ : p ∧ ¬s, from not_iff p s (and.elim_right n₁),
+        have hrs: r ∨ s, from h (and.elim_left n₂),
+        have nrs: ¬(r ∨ s), from iff.elim_right (not_or_and_not r s) (and.intro n₂.right n₃.right),
+        show false, from absurd hrs nrs)
+
+example : ¬(p ∧ q) → ¬p ∨ ¬q :=
+    assume h : ¬(p ∧ q),
+    by_cases
+        (assume hp: p, 
+        have nq: ¬q, from by_contradiction(
+            assume nnq: ¬¬q,
+            have hq: q, from iff.elim_left (notnot q) nnq,
+            have n : p ∧ q, from and.intro hp hq,
+            show false, from absurd n h),
+        show ¬p ∨ ¬q, from or.intro_right (¬p) nq)
+        (assume np: ¬p, show ¬p ∨ ¬q, from or.intro_left (¬q) np)
+    
+-- changed to lemma for later use
+lemma implies_as_or : (p → q) → (¬p ∨ q) :=
+assume h : p → q,
+by_cases
+    (assume hp : p,
+    have hq: q, from h hp,
+    show ¬p ∨ q, from or.intro_right (¬p) hq)
+    (assume np : ¬p, show ¬p ∨ q, from or.intro_left (q) np)
+
+example : (¬q → ¬p) → (p → q) :=
+    assume h : ¬q → ¬p
+
+example : p ∨ ¬p := em p
+
 example : (((p → q) → p) → p) := sorry
