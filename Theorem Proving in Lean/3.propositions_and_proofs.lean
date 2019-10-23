@@ -288,8 +288,19 @@ by_cases
     (assume np : ¬p, show ¬p ∨ q, from or.intro_left (q) np)
 
 example : (¬q → ¬p) → (p → q) :=
-    assume h : ¬q → ¬p
+    assume h : ¬q → ¬p,
+    assume hp : p,
+    by_contradiction (
+        assume nq: ¬q,
+        have np : ¬p, from h nq,
+        show false, from absurd hp np)
 
 example : p ∨ ¬p := em p
 
-example : (((p → q) → p) → p) := sorry
+example : (((p → q) → p) → p) :=
+    by_contradiction
+        (assume n : ¬ (((p → q) → p) → p),
+        have h₀ : ((p → q) → p) ∧ ¬p, from not_iff ((p → q) → p) p n,
+        have h₁ : ¬(p → q), from (reverse_imp (p → q) p h₀.left) h₀.right,
+        have h₂ : p ∧ ¬q, from not_iff p q h₁,
+        show false, from absurd h₂.left h₀.right)
