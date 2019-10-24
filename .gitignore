@@ -1,0 +1,7 @@
+# IDEs
+.vs
+.idea
+.vscode
+
+# Local
+.tmp
