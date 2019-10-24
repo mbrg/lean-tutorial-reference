@@ -408,3 +408,21 @@ namespace six
     ... = log (exp (log x + log y)) : by rw exp_add
     ... = log x + log y : by rw log_exp_eq
 end six
+
+namespace seven
+    /-
+    Prove the theorem below, using only the ring properties of ℤ enumerated in Section 4.2 
+    and the theorem sub_self.
+    -/
+    #check sub_self
+
+    example (x : ℤ) : x * 0 = 0 :=
+    calc
+    x * 0 = x * (0 - 0) : by rw sub_self
+    ... = x * 0 - x * 0 : by rw mul_sub
+    ... = 0 * x - 0 * x : by rw mul_comm
+    ... = 0 * (x - x) : by rw mul_sub
+    ... = 0 * 0 : by rw sub_self
+    ... = 0 : by refl
+
+end seven
